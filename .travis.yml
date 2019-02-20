@@ -2,12 +2,12 @@ language: julia
 
 os:
   - linux
-  - osx
+  #- osx
 
 julia:
-  - 1.0
   - 1.1
-  - nightly
+  #- 1.0
+  #- nightly
 
 matrix:
   allow_failures:
@@ -19,6 +19,7 @@ addons:
 
 branches:
   only:
+    - docs-testing
     - master
     - /^v\d+\.\d+(\.\d+)?(-\S*)?$/ # tags
 
@@ -27,17 +28,11 @@ before_install:
   - if [ `uname` == "Darwin" ]; then brew update; brew cask uninstall oclint; brew install gcc; brew tap optimizers/cutest; brew install cutest; brew install mastsif; for f in "archdefs" "sifdecode" "mastsif" "cutest"; do source $(brew --prefix $f)/$f.bashrc; done; fi
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
 
-install:
-  - julia -E 'using Pkg; Pkg.clone(pwd()); Pkg.build("CUTEst");'
-
-script:
-  - julia --check-bounds=yes -E 'using Pkg; Pkg.test("CUTEst"; coverage=true)'
-
 jobs:
   include:
     - stage: Documentation
       julia: 1.1
-      os: Linux
+      os: linux
       script:
         - julia --project=docs -e 'using Pkg; Pkg.instantiate(); Pkg.add(PackageSpec(path=pwd()))'
         - julia --project=docs docs/make.jl
