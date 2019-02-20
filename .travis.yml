@@ -5,7 +5,6 @@ os:
   - osx
 
 julia:
-  - 0.7
   - 1.0
   - 1.1
   - nightly
@@ -21,6 +20,7 @@ addons:
 branches:
   only:
     - master
+    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/ # tags
 
 before_install:
   - if [ `uname` == "Linux" ]; then unset DY_LIBRARY_PATH; fi
@@ -33,6 +33,15 @@ install:
 script:
   - julia --check-bounds=yes -E 'using Pkg; Pkg.test("CUTEst"; coverage=true)'
 
+jobs:
+  include:
+    - stage: Documentation
+      julia: 1.1
+      os: Linux
+      script:
+        - julia --project=docs -e 'using Pkg; Pkg.instantiate(); Pkg.add(PackageSpec(path=pwd()))'
+        - julia --project=docs docs/make.jl
+      after_success: skip
+
 after_success:
-  - julia -e 'using Pkg; Pkg.add("Documenter"); Pkg.clone("https://github.com/JuliaSmoothOptimizers/Krylov.jl"); Pkg.add("Krylov"); cd(Pkg.dir("CUTEst")); include(joinpath("docs", "make.jl"))'
   - julia -e 'using Pkg; cd(Pkg.dir("CUTEst")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(Coveralls.process_folder()); Codecov.submit(process_folder())'
