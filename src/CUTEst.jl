@@ -194,7 +194,7 @@ function sifdecoder(name :: AbstractString, args...; verbose :: Bool=false,
       @show readdir()
       delete_temp_files()
       @show readdir()
-      global cutest_lib = Libdl.dlopen("$libname.$(Libdl.dlext)",
+      global cutest_lib = Libdl.dlopen("./$libname.$(Libdl.dlext)",
         Libdl.RTLD_NOW | Libdl.RTLD_DEEPBIND | Libdl.RTLD_GLOBAL)
     end
   end
