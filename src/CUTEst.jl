@@ -191,9 +191,8 @@ function sifdecoder(name :: AbstractString, args...; verbose :: Bool=false,
       end
       run(`mv OUTSDIF.d $outsdif`)
       run(`mv AUTOMAT.d $automat`)
-      @show readdir()
       delete_temp_files()
-      @show readdir()
+      @show Libdl.DL_LOAD_PATH
       global cutest_lib = Libdl.dlopen("./$libname.$(Libdl.dlext)",
         Libdl.RTLD_NOW | Libdl.RTLD_DEEPBIND | Libdl.RTLD_GLOBAL)
     end
