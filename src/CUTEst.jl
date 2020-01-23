@@ -187,6 +187,7 @@ function sifdecoder(name :: AbstractString, args...; verbose :: Bool=false,
         run(`$linker $sh_flags -o $libname.$(Libdl.dlext) ELFUN.o EXTER.o GROUP.o RANGE.o -Wl,-rpath $libpath $(joinpath(libpath, "libcutest_double.$(Libdl.dlext)")) $libgfortran`)
       else
         run(`$linker $sh_flags -o $libname.$(Libdl.dlext) ELFUN.o EXTER.o GROUP.o RANGE.o -rpath=$libpath -L$libpath -lcutest_double $libgfortran`)
+        run(`ldd $libname.$(Libdl.dlext)`)
       end
       run(`mv OUTSDIF.d $outsdif`)
       run(`mv AUTOMAT.d $automat`)
