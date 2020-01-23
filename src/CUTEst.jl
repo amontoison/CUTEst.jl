@@ -50,7 +50,6 @@ end
 
 global const cutest_problems_path = joinpath(dirname(@__FILE__), "../deps", "files")
 isdir(cutest_problems_path) || mkpath(cutest_problems_path)
-push!(Libdl.DL_LOAD_PATH, cutest_problems_path)
 global cutest_lib = C_NULL
 
 global __sif_repo_cloned = false
@@ -94,6 +93,7 @@ function __init__()
     # end
   end
   global libpath = joinpath(ENV["CUTEST"], "objects", ENV["MYARCH"], "double")
+  push!(Libdl.DL_LOAD_PATH, cutest_problems_path)
 end
 
 CUTEstException(info :: Integer) = CUTEstException(convert(Int32, info))
