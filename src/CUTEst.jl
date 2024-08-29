@@ -53,5 +53,6 @@ include("sifdecoder.jl")
 include("core_interface.jl")
 include("julia_interface.jl")
 include("classification.jl")
+include("create_class.jl")
 
 end  # module CUTEst.

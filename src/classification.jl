@@ -27,78 +27,62 @@ const classdb_contype = Dict(
 const origins = ["academic", "modelling", "real"]
 const classdb_origin = Dict("A" => origins[1], "M" => origins[2], "R" => origins[3])
 
-include("create_class.jl")
-
 """
-    select(;min_var=1, max_var=Inf, min_con=0, max_con=Inf,
-            objtype=*, contype=*,
-            only_free_var=false, only_bnd_var=false,
-            only_linear_con=false, only_nonlinear_con=false,
-            only_equ_con=false, only_ineq_con=false,
-            custom_filter=*)
+    select(; min_var=1, max_var=Inf, min_con=0, max_con=Inf,
+             objtype=*, contype=*,
+             only_free_var=false, only_bnd_var=false,
+             only_linear_con=false, only_nonlinear_con=false,
+             only_equ_con=false, only_ineq_con=false,
+             custom_filter=*)
 
-Returns a subset of the CUTEst problems using the classification file
-`classf.json`. This file is export together with the package, so if you have an
-old CUTEst installation, it can lead to inconsistencies.
+Returns a subset of the CUTEst problems based on the classification file `classf.json`.
+This file is included with the package.
 
-- `min_var` and `max_var` set the number of variables in the problem;
-- `min_con` and `max_con` set the number of constraints in the problem
-(e.g., use `max_con=0` for unconstrained or `min_con=1` for constrained)
-- `only_*` flags are self-explaining. Note that they appear in conflicting
-pairs. Both can be false, but only one can be true.
-- `objtype` is the classification of the objective function according to the
-[MASTSIF classification file](https://www.cuter.rl.ac.uk/Problems/classification.shtml).
-It can be a number, a symbol, a string, or an array of those.
+## Arguments
 
-    1, :none or "none" means there is no objective function;
-    2, :constant or "constant" means the objective function is a constant;
-    3, :linear or "linear" means the objective function is a linear functional;
-    4, :quadratic or "quadratic" means the objective function is quadratic;
-    5, :sum_of_squares or "sum_of_squares" means the objective function is a sum of squares
-    6, :other or "other" means the objective function is none of the above.
+- `min_var` and `max_var`: Define the range for the number of variables in the problem.
+- `min_con` and `max_con`: Define the range for the number of constraints in the problem (e.g., use `max_con=0` for unconstrained problems or `min_con=1` for constrained problems).
+- `only_*` flags:
+  - `only_free_var`: Include only problems with free variables.
+  - `only_bnd_var`: Include only problems with bounded variables.
+  - `only_linear_con`: Include only problems with linear constraints.
+  - `only_nonlinear_con`: Include only problems with nonlinear constraints.
+  - `only_equ_con`: Include only problems with equality constraints.
+  - `only_ineq_con`: Include only problems with inequality constraints.
+  Note: These flags are mutually exclusive; only one can be true at a time, or both can be false.
 
-- `contype` is the classification of the constraints according to the same
-  MASTSIF classification file.
+- `objtype`: Classification of the objective function according to the [MASTSIF classification file](https://www.cuter.rl.ac.uk/Problems/classification.shtml). It can be a number, a symbol, a string, or an array of those:
+  - `1`, `:none` or `"none"`: No objective function.
+  - `2`, `:constant` or `"constant"`: Objective function is a constant.
+  - `3`, `:linear` or `"linear"`: Objective function is linear.
+  - `4`, `:quadratic` or `"quadratic"`: Objective function is quadratic.
+  - `5`, `:sum_of_squares` or `"sum_of_squares"`: Objective function is a sum of squares.
+  - `6`, `:other` or `"other"`: Objective function does not fit the above categories.
 
-    1, :unc or "unc" means there are no constraints at all;
-    2, :fixed_vars or "fixed_vars" means the only constraints are fixed variables;
-    3, :bounds or "bounds" means the only constraints are bounded variables;
-    4, :network or "network" means the constraints represent the adjacency matrix of a (linear) network;
-    5, :linear or "linear" means the constraints are linear;
-    6, :quadratic or "quadratic" means the constraints are quadratic;
-    7, :other or "other" means the constraints are more general.
+- `contype`: Classification of the constraints according to the same MASTSIF classification file:
+  - `1`, `:unc` or `"unc"`: No constraints.
+  - `2`, `:fixed_vars` or `"fixed_vars"`: Only fixed variables.
+  - `3`, `:bounds` or `"bounds"`: Only bounded variables.
+  - `4`, `:network` or `"network"`: Constraints represent a network adjacency matrix.
+  - `5`, `:linear` or `"linear"`: Linear constraints.
+  - `6`, `:quadratic` or `"quadratic"`: Quadratic constraints.
+  - `7`, `:other` or `"other"`: More general constraints.
 
-- `custom_filter` is a function to be applied to the problem data, which is a
-  dict with the following fields:
+- `custom_filter`: A function to apply additional filtering to the problem data, which is a dictionary with the following fields:
+  - `"objtype"`: String representing the objective function type.
+  - `"contype"`: String representing the constraint type.
+  - `"regular"`: Boolean indicating whether the problem is regular.
+  - `"derivative_order"`: Integer for the highest derivative order available.
+  - `"origin"`: String indicating the origin of the problem: `"academic"`, `"modelling"`, or `"real"`.
+  - `"has_interval_var"`: Boolean indicating if there are interval variables.
+  - `"variables"`: Dictionary with fields related to variables.
+  - `"constraints"`: Dictionary with fields related to constraints.
 
-    "objtype"           - String    one of the above objective function types
-    "contype"           - String    one of the above constraint types
-    "regular"           - Bool      whether the problem is regular or not
-    "derivative_order"  - Int       order of the highest derivative available
-    "origin"            - String    origin of the problem: "academic", "modelling" or "real"
-    "has_interval_var"  - Bool      whether it has interval variables
-    "variables"         - Dict with the following fields
-      "can_choose"      - Bool      whether you can change the number of variables via parameters
-      "number"          - Int       the number of variables (if `can_choose`, the default)
-      "fixed"           - Int       the number of fixed variables
-      "free"            - Int       the number of free variables
-      "bounded_below"   - Int       the number of variables bounded only from below
-      "bounded_above"   - Int       the number of variables bounded only from above
-      "bounded_both"    - Int       the number of variables bounded from below and above
-    "constraints"       - Dict with the following fields
-      "can_choose"      - Bool      whether you can change the number of constraints via parameters
-      "number"          - Int       the number of constraints (if `can_choose`, the default)
-      "equality"        - Int       the number of equality constraints
-      "ineq_below"      - Int       the number of inequalities of the form c(x) ≧ cl
-      "ineq_above"      - Int       the number of inequalities of the form c(x) ≦ cu
-      "ineq_both"       - Int       the number of inequalities of the form cl ≦ c(x) ≦ cu
-      "linear"          - Int       the number of linear constraints
-      "nonlinear"       - Int       the number of nonlinear constraints
+To select only problems with a fixed number of variables, use:
 
-For instance, if you'd like to choose only problems with fixed number of
-  variables, you can pass
-
-    custom_filter=x->x["variables"]["can_choose"]==false
+```julia
+custom_filter = x -> x["variables"]["can_choose"] == false
+```
 """
 function select(;
   min_var = 1,

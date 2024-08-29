@@ -111,7 +111,7 @@ ENV["MASTSIF"] = mastsif_backup
       end
       selection_alt = CUTEst.select(contype = CUTEst.contypes[i])
       @test sort(selection_alt) == sort(selection)
-      selection_alt = CUTEst.select(contype = Symbol(CUTEst.contypes[i]))
+      selection_alt = CUTEst.select(contype = CUTEst.contypes[i] |> Symbol)
       @test sort(selection_alt) == sort(selection)
     end
     @test npi == np
@@ -128,31 +128,29 @@ ENV["MASTSIF"] = mastsif_backup
     end
   end
 
-  #=
-  @testset "Consistency" begin
-    set1 = CUTEst.select(contype=["unc"])
-    set2 = CUTEst.select(max_con=0, only_free_var=true)
-    @test sort(set1) == sort(set2)
+  # @testset "Consistency" begin
+  #   set1 = CUTEst.select(contype=["unc"])
+  #   set2 = CUTEst.select(max_con=0, only_free_var=true)
+  #   @test sort(set1) == sort(set2)
 
-    set1 = CUTEst.select(contype=["fixed_vars"])
-    set2 = CUTEst.select(max_con=0, custom_filter=x ->(
-      x["variables"]["fixed"] > 0) && (x["variables"]["fixed"] +
-      x["variables"]["free"] == x["variables"]["number"]))
-    @test sort(set1) == sort(set2)
+  #   set1 = CUTEst.select(contype=["fixed_vars"])
+  #   set2 = CUTEst.select(max_con=0, custom_filter=x ->(
+  #     x["variables"]["fixed"] > 0) && (x["variables"]["fixed"] +
+  #     x["variables"]["free"] == x["variables"]["number"]))
+  #   @test sort(set1) == sort(set2)
 
-    set1 = CUTEst.select(contype=["unc", "fixed_vars", "bounds"])
-    set2 = CUTEst.select(max_con=0)
-    @test sort(set1) == sort(set2)
+  #   set1 = CUTEst.select(contype=["unc", "fixed_vars", "bounds"])
+  #   set2 = CUTEst.select(max_con=0)
+  #   @test sort(set1) == sort(set2)
 
-    set1 = CUTEst.select(contype=["linear"])
-    set2 = CUTEst.select(min_con=1, only_linear_con=true)
-    println("Mastsif says L, but decoding gives otherwise")
-    println(setdiff(set1, set2))
-    println("Decoding gives linear, but Mastsif disagrees")
-    println(setdiff(set2, set1))
-    #@test sort(set1) == sort(set2)
-  end
-  =#
+  #   set1 = CUTEst.select(contype=["linear"])
+  #   set2 = CUTEst.select(min_con=1, only_linear_con=true)
+  #   println("Mastsif says L, but decoding gives otherwise")
+  #   println(setdiff(set1, set2))
+  #   println("Decoding gives linear, but Mastsif disagrees")
+  #   println(setdiff(set2, set1))
+  #   #@test sort(set1) == sort(set2)
+  # end
 
   @testset "Canonicalization" begin
     set1 = CUTEst.select(objtype = 1:4)

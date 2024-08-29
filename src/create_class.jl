@@ -1,12 +1,12 @@
 import DataStructures: OrderedDict
 using JSON
 
-"""`create_class()`
+"""
+    create_class()
 
-Creates the file `classf.json`, running each problem in `\$MASTSIF/CLASSF.DB` and
-extracting the necessary information. It should be left alone, unless you think
-it is not updated. If you do, please open an issue at
-[https://github.com/JuliaSmoothOptimizers/CUTEst.jl](https://github.com/JuliaSmoothOptimizers/CUTEst.jl)
+Creates the file `classf.json` by running each problem listed in the `CLASSF.DB` file within the `"sifcollection"` set and extracting the necessary information.
+This file should be left unchanged unless you suspect it is outdated.
+If so, please open an issue at [https://github.com/JuliaSmoothOptimizers/CUTEst.jl](https://github.com/JuliaSmoothOptimizers/CUTEst.jl).
 """
 function create_class()
   classdb = open(readlines, joinpath(ENV["MASTSIF"], "CLASSF.DB"))
